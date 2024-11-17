@@ -1,0 +1,76 @@
+#include <Servo.h>
+
+Servo servo;
+
+int servo_pin = 3;
+int TRIG_PIN = 12;
+int ECHO_PIN = 13;
+int OUTPUT_1 = 6;
+int OUTPUT_2 = 5;
+float SPEED_OF_SOUND = 0.0345;
+
+void setup() {
+  //pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(OUTPUT_1, OUTPUT);
+  pinMode(OUTPUT_2, OUTPUT);
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  pinMode(11, OUTPUT);
+  digitalWrite(TRIG_PIN, LOW);
+  digitalWrite(11, HIGH);
+  Serial.begin(9600);
+  servo.attach(servo_pin, 800, 2200);
+}
+
+bool pre = true;
+bool backward = false;
+
+/*float calc_distance() {
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+  int microsecs = pulseIn(ECHO_PIN, HIGH);
+  return (float)microsecs * SPEED_OF_SOUND / 2;
+}*/
+
+void loop() {
+  if (!backward) {
+    if (pre) {
+      servo.write(0);
+      delay(1000);
+      pre = false;
+    }
+    digitalWrite(TRIG_PIN, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(TRIG_PIN, LOW);
+    int microsecs = pulseIn(ECHO_PIN, HIGH);
+    float cms = microsecs * SPEED_OF_SOUND / 2;
+    //Serial.println(cms);
+    //Serial.println(1);
+    if (cms < 7) {
+      //digitalWrite(LED_BUILTIN, HIGH);
+      digitalWrite(OUTPUT_1, LOW);
+      digitalWrite(OUTPUT_2, LOW);
+      delay(1000);
+      /*for (int i = 0; i <= 180 ; i += 10) {
+       servo.write(i);
+       delay(5);
+      }*/
+      servo.write(180);
+     // servo.write(90);
+      backward = true;
+      delay(500);
+      servo.write(0);
+      //delay(1000);
+    } else {
+      //digitalWrite(LED_BUILTIN, HIGH);
+      digitalWrite(OUTPUT_1, LOW);
+      digitalWrite(OUTPUT_2, HIGH);
+    }
+    delay(10);
+  } else {
+    //digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(OUTPUT_1, HIGH);
+    digitalWrite(OUTPUT_2, LOW);
+  }
+}
